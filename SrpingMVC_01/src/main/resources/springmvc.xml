@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:mvc="http://www.springframework.org/schema/mvc"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+        http://www.springframework.org/schema/mvc http://www.springframework.org/schema/mvc/spring-mvc-4.0.xsd
+        http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-4.0.xsd">
+        
+        <context:component-scan base-package="com.meiyukai.controller">
+			<context:include-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+			<context:exclude-filter type="annotation" expression="org.springframework.stereotype.Service"/>
+		</context:component-scan>
+
+	<mvc:annotation-driven conversion-service="myConverter"/>
+
+	<bean class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+		<property name="prefix" value="/jsp/"/>
+		<property name="suffix" value=".jsp"/>
+	</bean>
+
+
+        <mvc:resources mapping="/js/**" location="/js/"/>
+
+
+        <!--	释放静态资源 否则静态资源和 url 都会出问题-->
+        <mvc:default-servlet-handler/>
+
+	<!--文件上传的资源解析器    id=multipartResolver 只能这么写 -->
+	<bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+		<property name="maxUploadSize" value="8388608"/>
+	</bean>
+
+
+
+	<bean id="myConverter" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+		<property name="converters">
+			<bean class="com.meiyukai.util.myDateConverter"/>
+		</property>
+	</bean>
+        
+        <!-- 日期转化器 -->
+        <!--<bean id= "myconverters" class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        	<property name="converters">
+        		<bean class="com.meiyukai.utils.DataConverter"/>
+        	</property>
+        </bean>-->
+        
+
+	<!--异常处理-->
+	<bean class="com.meiyukai.exception.MyExceptionHandler"/>
+        
+
+        
+
+        <!--配置登陆拦截器-->
+			<mvc:interceptors>
+				<mvc:interceptor>
+					<mvc:mapping path="/**"/>
+					<mvc:exclude-mapping path="/interceptor/**"/>
+					<bean class="com.meiyukai.interceptor.LoginInterceptor"/>
+				</mvc:interceptor>
+			</mvc:interceptors>
+        
+        
+        
+        
+        </beans>
